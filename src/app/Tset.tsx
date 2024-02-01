@@ -34,8 +34,6 @@ const TaskInputForm = () => {
         created_at: currentDate,
         updated_at: "2023-01-02T17:00:00Z",
       });
-      // getTask();
-      //fetchTaskData()
     } catch (error) {
       console.error("Error adding task:", error);
     }
