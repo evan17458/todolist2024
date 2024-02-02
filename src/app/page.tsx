@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { Button, List, Checkbox, Input, Pagination, Modal } from "antd";
+import { Button, List, Checkbox, Input, Pagination } from "antd";
 import { CloseCircleOutlined, PlusSquareTwoTone } from "@ant-design/icons";
-
 export default function Home() {
   interface item {
     description: string;
@@ -16,18 +15,19 @@ export default function Home() {
   const [data, setData] = useState<item[]>([]);
   const [newTaskName, setNewTaskName] = useState<string>("");
   const [filteredTasks, setFilteredTasks] = useState<item[]>([]);
-
   const [putTaskName, setPutTaskName] = useState<string>("");
   const [putDescription, setputDescription] = useState<string>("");
   const [Description, setDescription] = useState<string>("");
-  const [error, setError] = useState("");
-  const [errorDescription, setErrorDescription] = useState("");
-  const [errorEditName, setErrorEditName] = useState("");
-  const [errorEditDescription, setErrorEditDescription] = useState("");
-  const [total, setTotal] = useState(0);
+  const [error, setError] = useState<string>("");
+  const [errorDescription, setErrorDescription] = useState<string>("");
+  const [errorEditName, setErrorEditName] = useState<string>("");
+  const [errorEditDescription, setErrorEditDescription] = useState<string>("");
+  const [total, setTotal] = useState<number>(0);
   const currentRef = useRef<number>(1);
-  // const putTaskName = useRef<string>("");
-  const [editingName, setEditingName] = useState(-1);
+  const [editingName, setEditingName] = useState<number>(-1);
+  useEffect(() => {
+    getTask();
+  }, []);
   const apiUrl = "https://wayi.league-funny.com/api/task";
 
   const handleDelete = async (id: number) => {
@@ -41,9 +41,9 @@ export default function Home() {
   };
   const handlePutApi = async (id: number) => {
     if (putTaskName === "") {
-      setError("必填");
+      setErrorEditName("必填");
+      return;
     }
-
     try {
       setEditingName(-1);
       await axios.put<item>(`${apiUrl}/${id}`, {
@@ -84,62 +84,44 @@ export default function Home() {
     try {
       const response = await axios.get(`${apiUrl}?page=${currentRef.current}`);
       setTotal(response.data.total);
-      const ans = response.data.data;
-      const newArray: {
-        description: string;
-        name: string;
-        id: number;
-        is_completed: boolean;
-      }[] = ans.map((item: item) => ({
-        description: item.description,
-        name: item.name,
-        id: item.id,
-        is_completed: item.is_completed,
-      }));
-      setData(newArray);
+      const totalTask = response.data.data;
+      setData(totalTask);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
-  const InputName = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setValue: React.Dispatch<React.SetStateAction<string>>,
+    setError: React.Dispatch<React.SetStateAction<string>>,
+    maxLength: number
+  ) => {
     const inputValue = e.target.value;
-    if (inputValue.length > 10) {
-      setError("最多10個字");
+    if (inputValue.length > maxLength) {
+      setError(`最多${maxLength}個字`);
     } else {
       setError("");
     }
-    setNewTaskName(inputValue);
+    setValue(inputValue);
+  };
+
+  // 在組件中使用這個通用函數
+  const InputName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange(e, setNewTaskName, setError, 10);
   };
 
   const InputDsciption = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    if (inputValue.length > 30) {
-      setErrorDescription("最多30個字");
-    } else {
-      setErrorDescription("");
-    }
-    setDescription(inputValue);
+    handleInputChange(e, setDescription, setErrorDescription, 30);
   };
 
   const editName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    if (inputValue.length > 10) {
-      setErrorEditName("最多10個字");
-    } else {
-      setErrorEditName("");
-    }
-    setPutTaskName(inputValue);
+    handleInputChange(e, setPutTaskName, setErrorEditName, 10);
   };
+
   const editDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    if (inputValue.length > 30) {
-      setErrorEditDescription("最多30個字");
-    } else {
-      setErrorEditDescription("");
-    }
-    setputDescription(inputValue);
+    handleInputChange(e, setputDescription, setErrorEditDescription, 30);
   };
+
   const handleShowCompleted = () => {
     const completedTasks = data.filter((item) => item.is_completed === true);
     setFilteredTasks(completedTasks);
@@ -148,10 +130,7 @@ export default function Home() {
     setFilteredTasks([]);
   };
 
-  useEffect(() => {
-    getTask();
-  }, []);
-  const onChange = (page: number) => {
+  const onPageChanged = (page: number) => {
     currentRef.current = page;
     getTask();
   };
@@ -165,7 +144,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex mx:w-[375px] md:w-[500px] lg:w-[700px] ">
+      <div className="flex mx:w-[375px] md:w-[536px] lg:w-[700px] ">
         <div>
           <Input
             placeholder="任務名稱"
@@ -174,7 +153,7 @@ export default function Home() {
           />
           {error && <div className="text-red-500">{error}</div>}
         </div>
-        <div className="mx:w-[200px] md:w-[300px] lg:w-[500px]">
+        <div className="mx:w-[200px] md:w-[450px] lg:w-[500px]">
           <Input
             placeholder="任務描述"
             value={Description}
@@ -197,7 +176,7 @@ export default function Home() {
           dataSource={filteredTasks.length > 0 ? filteredTasks : data}
           renderItem={(item, index) => (
             <List.Item>
-              <div className="flex justify-between w-full bg-white p-4 min-[500px]:w-[375px] md:w-[500px] lg:w-[700px]">
+              <div className="flex justify-between w-full bg-white p-4  min-[374px]:w-[375px] min-[500px]:w-[450px] md:w-[530px] lg:w-[700px]">
                 {editingName === index ? (
                   <div className="w-3/12">
                     名稱: {item.name}
@@ -246,7 +225,6 @@ export default function Home() {
                     {item.description}
                   </div>
                 )}
-                {/* </div> */}
                 <div className="w-1/12 text-center">
                   <Checkbox
                     checked={item.is_completed}
@@ -269,7 +247,7 @@ export default function Home() {
       <div>
         <Pagination
           current={currentRef.current}
-          onChange={onChange}
+          onChange={onPageChanged}
           total={total}
         />
       </div>
