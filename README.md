@@ -1,4 +1,4 @@
-node版本  v18.19.0
+使用node版本  v18.19.0
 ## Getting Started
 
 First, run the development server:
