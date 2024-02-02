@@ -122,47 +122,51 @@ export default function Home() {
     getTask();
   };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-2">
-      <div className="flex ml-auto items-center ">
-        <div className="flex ml-auto items-center w-[300px]">
-          <div> 總筆數: {total}</div>
-          <Button onClick={handleShowAll}>全部</Button>
-          <Button onClick={handleShowCompleted}>已完成</Button>
-        </div>
-      </div>
-
-      <div className="flex mx:w-[375px] md:w-[536px] lg:w-[700px] ">
-        <div>
-          <Input
-            placeholder="任務名稱"
-            value={newTaskName}
-            onChange={InputName}
-          />
-          {error && <div className="text-red-500">{error}</div>}
-        </div>
-        <div className="mx:w-[200px] md:w-[450px] lg:w-[500px]">
-          <Input
-            placeholder="任務描述"
-            value={Description}
-            onChange={InputDsciption}
-            className="h-[30px]"
-          />
-          {errorDescription && (
-            <div className="text-red-500">{errorDescription}</div>
-          )}
-        </div>
-        <PlusSquareTwoTone
-          className="cursor-pointer text-3xl "
-          onClick={handleAddTask}
-        />
-      </div>
+    <main className="flex min-h-screen flex-col items-center ">
       <div>
         <List
-          bordered
+          header={
+            data.length > 1 && (
+              <div className="flex mx:w-[375px] md:w-[536px] lg:w-[700px] ">
+                <div>
+                  <Input
+                    placeholder="任務名稱"
+                    value={newTaskName}
+                    onChange={InputName}
+                  />
+                  {error && <div className="text-red-500">{error}</div>}
+                </div>
+                <div className="mx:w-[200px] md:w-[450px] lg:w-[500px]">
+                  <Input
+                    placeholder="任務描述"
+                    value={Description}
+                    onChange={InputDsciption}
+                    className="h-[30px]"
+                  />
+                  {errorDescription && (
+                    <div className="text-red-500">{errorDescription}</div>
+                  )}
+                </div>
+                <PlusSquareTwoTone
+                  className="cursor-pointer text-3xl "
+                  onClick={handleAddTask}
+                />
+              </div>
+            )
+          }
+          footer={
+            data.length > 1 && (
+              <div className="flex justify-around">
+                <div> 總筆數: {total}</div>
+                <Button onClick={handleShowAll}>全部</Button>
+                <Button onClick={handleShowCompleted}>已完成</Button>
+              </div>
+            )
+          }
           dataSource={filteredTasks.length > 0 ? filteredTasks : data}
           renderItem={(item, index) => (
             <List.Item>
-              <div className="flex justify-between w-full bg-white p-4  min-[374px]:w-[375px] min-[500px]:w-[450px] md:w-[530px] lg:w-[700px]">
+              <div className="flex  w-full bg-white p-4  min-[374px]:w-[375px] min-[500px]:w-[450px] md:w-[530px] lg:w-[700px]">
                 {editingName === index ? (
                   <div className="w-3/12">
                     名稱: {item.name}
@@ -229,11 +233,13 @@ export default function Home() {
         />
       </div>
       <div>
-        <Pagination
-          current={currentRef.current}
-          onChange={onPageChanged}
-          total={total}
-        />
+        {data.length > 1 && (
+          <Pagination
+            current={currentRef.current}
+            onChange={onPageChanged}
+            total={total}
+          />
+        )}
       </div>
     </main>
   );
