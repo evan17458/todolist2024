@@ -3,6 +3,8 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Button, List, Checkbox, Input, Pagination } from "antd";
 import { CloseCircleOutlined, PlusSquareTwoTone } from "@ant-design/icons";
+import { formatDate, handleError } from "./utils";
+import { deleteTask, patchTask, addTask, apiUrl, editTask } from "./api";
 export default function Home() {
   interface item {
     description: string;
@@ -10,8 +12,6 @@ export default function Home() {
     id: number;
     is_completed: boolean;
   }
-  const moment = require("moment");
-  const currentDate = moment().format("YYYY-MM-DDTHH:mm:ss[Z]");
   const [data, setData] = useState<item[]>([]);
   const [newTaskName, setNewTaskName] = useState<string>("");
   const [filteredTasks, setFilteredTasks] = useState<item[]>([]);
@@ -28,66 +28,55 @@ export default function Home() {
   useEffect(() => {
     getTask();
   }, []);
-  const apiUrl = "https://wayi.league-funny.com/api/task";
-
   const handleDelete = async (id: number) => {
-    await axios.delete(`${apiUrl}/${id}`);
+    await deleteTask(id);
     getTask();
   };
-
   const handlePatch = async (id: number) => {
-    await axios.patch(`${apiUrl}/${id}`);
+    await patchTask(id);
     getTask();
+  };
+  const handleAddTask = async () => {
+    if (newTaskName === "") {
+      setError("必填");
+      return;
+    }
+    await addTask({
+      name: newTaskName,
+      description: Description,
+      is_completed: false,
+      created_at: formatDate(),
+    });
+    getTask();
+    setNewTaskName("");
+    setDescription("");
   };
   const handlePutApi = async (id: number) => {
     if (putTaskName === "") {
       setErrorEditName("必填");
       return;
     }
-    try {
-      setEditingName(-1);
-      await axios.put<item>(`${apiUrl}/${id}`, {
+    setEditingName(-1);
+    await editTask(
+      {
         name: putTaskName,
         description: putDescription,
         is_completed: false,
-        //created_at: currentDate,
-        updated_at: currentDate,
-      });
-      getTask();
-      setPutTaskName("");
-      setputDescription("");
-    } catch (error) {
-      console.error("Error Put task:", error);
-    }
-  };
-  const handleAddTask = async () => {
-    if (newTaskName === "") {
-      setError("必填");
-    } else {
-      try {
-        await axios.post<item>(`${apiUrl}`, {
-          name: newTaskName,
-          description: Description,
-          is_completed: false,
-          created_at: currentDate,
-          updated_at: "2023-01-02T17:00:00Z",
-        });
-        getTask();
-        setNewTaskName("");
-        setDescription("");
-      } catch (error) {
-        console.error("Error adding task:", error);
-      }
-    }
+        updated_at: formatDate(),
+      },
+      id
+    );
+    getTask();
+    setPutTaskName("");
+    setputDescription("");
   };
   const getTask = async () => {
     try {
       const response = await axios.get(`${apiUrl}?page=${currentRef.current}`);
       setTotal(response.data.total);
-      const totalTask = response.data.data;
-      setData(totalTask);
+      setData(response.data.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      handleError(error);
     }
   };
   const handleInputChange = (
@@ -104,8 +93,6 @@ export default function Home() {
     }
     setValue(inputValue);
   };
-
-  // 在組件中使用這個通用函數
   const InputName = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e, setNewTaskName, setError, 10);
   };
@@ -169,7 +156,6 @@ export default function Home() {
           onClick={handleAddTask}
         />
       </div>
-
       <div>
         <List
           bordered
@@ -229,9 +215,7 @@ export default function Home() {
                   <Checkbox
                     checked={item.is_completed}
                     onChange={() => handlePatch(item.id)}
-                  >
-                    {/* {item.id} */}
-                  </Checkbox>
+                  ></Checkbox>
                 </div>
                 <div className="w-1/12 text-center">
                   <CloseCircleOutlined

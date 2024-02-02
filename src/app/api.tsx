@@ -1,35 +1,37 @@
 import axios from "axios";
-
-interface TaskItem {
+interface item {
   description: string;
   name: string;
   id: number;
   is_completed: boolean;
 }
+export const apiUrl = "https://wayi.league-funny.com/api/task";
 
-const fetchTaskData = async (
-  currentPage: number,
-  setTotal: React.Dispatch<React.SetStateAction<number>>,
-  setData: React.Dispatch<React.SetStateAction<TaskItem[]>>
-): Promise<void> => {
+export const deleteTask = async (id: number) => {
   try {
-    const response = await axios.get(
-      `https://wayi.league-funny.com/api/task?page=${currentPage}`
-    );
-    setTotal(response.data.total);
-
-    const ans: any[] = response.data.data; // Adjust the type if necessary
-    const newArray: TaskItem[] = ans.map((item: any) => ({
-      description: item.description,
-      name: item.name,
-      id: item.id,
-      is_completed: item.is_completed,
-    }));
-
-    setData(newArray);
-  } catch (error) {
-    console.error("Error fetching data:", error);
+    await axios.delete(`${apiUrl}/${id}`);
+  } catch (error: any) {
+    throw new Error(error);
   }
 };
-
-export default fetchTaskData;
+export const patchTask = async (id: number) => {
+  try {
+    await axios.patch(`${apiUrl}/${id}`);
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+export const addTask = async (data: object) => {
+  try {
+    await axios.post<item>(`${apiUrl}`, data);
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+export const editTask = async (data: object, id: number) => {
+  try {
+    await axios.put<item>(`${apiUrl}/${id}`, data);
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
