@@ -126,7 +126,7 @@ export default function Home() {
       <div>
         <List
           header={
-            data.length > 1 && (
+            data.length > 0 && (
               <div className="flex mx:w-[375px] md:w-[536px] lg:w-[700px] ">
                 <div>
                   <Input
@@ -136,7 +136,7 @@ export default function Home() {
                   />
                   {error && <div className="text-red-500">{error}</div>}
                 </div>
-                <div className="mx:w-[200px] md:w-[450px] lg:w-[500px]">
+                <div className="min-[374px]:w-[165px] min-[500px]:w-[238px] md:w-[450px] lg:w-[500px]">
                   <Input
                     placeholder="任務描述"
                     value={Description}
@@ -155,7 +155,7 @@ export default function Home() {
             )
           }
           footer={
-            data.length > 1 && (
+            data.length > 0 && (
               <div className="flex justify-around">
                 <div> 總筆數: {total}</div>
                 <Button onClick={handleShowAll}>全部</Button>
@@ -182,7 +182,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div
-                    className={`w-full md:w-3/12 overflow-hidden cursor-pointer ${
+                    className={`w-full min-[374px]:w-[150px] min-[500px]:w-[186px]  md:w-3/12 overflow-hidden cursor-pointer ${
                       item.is_completed ? "line-through" : "no-underline"
                     }`}
                     onClick={() => setEditingName(index)}
@@ -233,7 +233,7 @@ export default function Home() {
         />
       </div>
       <div>
-        {data.length > 1 && (
+        {data.length > 0 && (
           <Pagination
             current={currentRef.current}
             onChange={onPageChanged}
