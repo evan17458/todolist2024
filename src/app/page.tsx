@@ -14,7 +14,6 @@ export default function Home() {
   }
   const [data, setData] = useState<item[]>([]);
   const [newTaskName, setNewTaskName] = useState<string>("");
-  const [filteredTasks, setFilteredTasks] = useState<item[]>([]);
   const [putTaskName, setPutTaskName] = useState<string>("");
   const [putDescription, setputDescription] = useState<string>("");
   const [Description, setDescription] = useState<string>("");
@@ -70,9 +69,12 @@ export default function Home() {
     setPutTaskName("");
     setputDescription("");
   };
-  const getTask = async () => {
+  const getTask = async (type?: string) => {
     try {
-      const response = await axios.get(`${apiUrl}?page=${currentRef.current}`);
+      const url = type
+        ? `${apiUrl}?type=${type}`
+        : `${apiUrl}?page=${currentRef.current}`;
+      const response = await axios.get(url);
       setTotal(response.data.total);
       setData(response.data.data);
     } catch (error) {
@@ -107,14 +109,6 @@ export default function Home() {
 
   const editDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e, setputDescription, setErrorEditDescription, 30);
-  };
-
-  const handleShowCompleted = () => {
-    const completedTasks = data.filter((item) => item.is_completed === true);
-    setFilteredTasks(completedTasks);
-  };
-  const handleShowAll = () => {
-    setFilteredTasks([]);
   };
 
   const onPageChanged = (page: number) => {
@@ -158,12 +152,13 @@ export default function Home() {
             data.length > 0 && (
               <div className="flex justify-around">
                 <div> 總筆數: {total}</div>
-                <Button onClick={handleShowAll}>全部</Button>
-                <Button onClick={handleShowCompleted}>已完成</Button>
+                <Button onClick={() => getTask()}>全部</Button>
+                <Button onClick={() => getTask("uncompleted")}>未完成</Button>
+                <Button onClick={() => getTask("completed")}>已完成</Button>
               </div>
             )
           }
-          dataSource={filteredTasks.length > 0 ? filteredTasks : data}
+          dataSource={data}
           renderItem={(item, index) => (
             <List.Item>
               <div className="flex  w-full bg-white p-4  min-[374px]:w-[375px] min-[500px]:w-[450px] md:w-[530px] lg:w-[700px]">
@@ -232,6 +227,7 @@ export default function Home() {
           )}
         />
       </div>
+
       <div>
         {data.length > 0 && (
           <Pagination
