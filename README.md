@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 # 使用node版本 v18.19.0
@@ -35,3 +36,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+=======
+# todolist2024
+todolist面試考題2024
+>>>>>>> cd7e440933cc36a5c1e0a8a52b7232cba7d9750d
