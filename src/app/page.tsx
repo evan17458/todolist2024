@@ -24,6 +24,7 @@ export default function Home() {
   const [total, setTotal] = useState<number>(0);
   const currentRef = useRef<number>(1);
   const [editingName, setEditingName] = useState<number>(-1);
+  const [editdescrption, setEditdescrption] = useState<number>(-1);
   useEffect(() => {
     getTask();
   }, []);
@@ -50,16 +51,21 @@ export default function Home() {
     setNewTaskName("");
     setDescription("");
   };
-  const handlePutApi = async (id: number) => {
-    if (putTaskName === "") {
+  const handlePutApi = async (
+    id: number,
+    name: string,
+    description: string
+  ) => {
+    if (!putTaskName && !name) {
       setErrorEditName("必填");
       return;
     }
     setEditingName(-1);
+    setEditdescrption(-1);
     await editTask(
       {
-        name: putTaskName,
-        description: putDescription,
+        name: name || putTaskName,
+        description: description || putDescription,
         is_completed: false,
         updated_at: formatDate(),
       },
@@ -173,7 +179,13 @@ export default function Home() {
                     {errorEditName && (
                       <div className="text-red-500">{errorEditName}</div>
                     )}
-                    <Button onClick={() => handlePutApi(item.id)}>修改</Button>
+                    <Button
+                      onClick={() =>
+                        handlePutApi(item.id, "", item.description)
+                      }
+                    >
+                      修改
+                    </Button>
                   </div>
                 ) : (
                   <div
@@ -186,7 +198,7 @@ export default function Home() {
                     {item.name}
                   </div>
                 )}
-                {editingName === index ? (
+                {editdescrption === index ? (
                   <div className="w-7/12">
                     描述:{item.description}
                     <Input
@@ -197,14 +209,18 @@ export default function Home() {
                     {errorEditDescription && (
                       <div className="text-red-500">{errorEditDescription}</div>
                     )}
-                    <Button onClick={() => handlePutApi(item.id)}>修改</Button>
+                    <Button
+                      onClick={() => handlePutApi(item.id, item.name, "")}
+                    >
+                      修改
+                    </Button>
                   </div>
                 ) : (
                   <div
                     className={`w-full md:w-7/12 overflow-hidden cursor-pointer ${
                       item.is_completed ? "line-through" : "no-underline"
                     }`}
-                    onClick={() => setEditingName(index)}
+                    onClick={() => setEditdescrption(index)}
                   >
                     描述:
                     {item.description}
