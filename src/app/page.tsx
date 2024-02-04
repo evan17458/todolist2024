@@ -30,6 +30,9 @@ export default function Home() {
   }, []);
   const handleDelete = async (id: number) => {
     await deleteTask(id);
+    if (total % 10 === 1 && data.length === 1) {
+      currentRef.current = 1;
+    }
     getTask();
   };
   const handlePatch = async (id: number) => {
@@ -104,19 +107,15 @@ export default function Home() {
   const InputName = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e, setNewTaskName, setError, 10);
   };
-
   const InputDsciption = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e, setDescription, setErrorDescription, 30);
   };
-
   const editName = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e, setPutTaskName, setErrorEditName, 10);
   };
-
   const editDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e, setputDescription, setErrorEditDescription, 30);
   };
-
   const onPageChanged = (page: number) => {
     currentRef.current = page;
     getTask();
@@ -199,7 +198,7 @@ export default function Home() {
                   </div>
                 )}
                 {editdescrption === index ? (
-                  <div className="w-7/12">
+                  <div className="w-7/12 text-ellipsis ">
                     描述:{item.description}
                     <Input
                       placeholder="輸入新描述"
@@ -217,7 +216,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <div
-                    className={`w-full md:w-7/12 overflow-hidden cursor-pointer ${
+                    className={`w-full md:w-7/12 overflow-hidden cursor-pointer text-ellipsis ${
                       item.is_completed ? "line-through" : "no-underline"
                     }`}
                     onClick={() => setEditdescrption(index)}
@@ -243,7 +242,6 @@ export default function Home() {
           )}
         />
       </div>
-
       <div>
         {data.length > 0 && (
           <Pagination
