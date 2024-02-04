@@ -193,12 +193,12 @@ export default function Home() {
                     }`}
                     onClick={() => setEditingName(index)}
                   >
-                    名稱:
+                    <span className="hidden md:inline">名稱:</span>
                     {item.name}
                   </div>
                 )}
                 {editdescrption === index ? (
-                  <div className="w-7/12 text-ellipsis ">
+                  <div className="w-full md:w-7/12 text-ellipsis ">
                     描述:{item.description}
                     <Input
                       placeholder="輸入新描述"
@@ -221,7 +221,7 @@ export default function Home() {
                     }`}
                     onClick={() => setEditdescrption(index)}
                   >
-                    描述:
+                    <span className="hidden md:inline">描述:</span>
                     {item.description}
                   </div>
                 )}
