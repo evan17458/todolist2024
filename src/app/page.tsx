@@ -59,16 +59,12 @@ export default function Home() {
     name: string,
     description: string
   ) => {
-    if (!putTaskName && !name) {
-      setErrorEditName("必填");
-      return;
-    }
     setEditingName(-1);
     setEditdescrption(-1);
     await editTask(
       {
-        name: name || putTaskName,
-        description: description || putDescription,
+        name: putTaskName || name,
+        description: putDescription || description,
         is_completed: false,
         updated_at: formatDate(),
       },
@@ -111,6 +107,10 @@ export default function Home() {
     handleInputChange(e, setDescription, setErrorDescription, 30);
   };
   const editName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === "") {
+      setErrorEditName("必填");
+      return;
+    }
     handleInputChange(e, setPutTaskName, setErrorEditName, 10);
   };
   const editDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,7 +172,7 @@ export default function Home() {
                     名稱: {item.name}
                     <Input
                       placeholder="輸入新名稱"
-                      value={putTaskName}
+                      defaultValue={item.name}
                       onChange={(e) => editName(e)}
                     />
                     {errorEditName && (
@@ -180,7 +180,7 @@ export default function Home() {
                     )}
                     <Button
                       onClick={() =>
-                        handlePutApi(item.id, "", item.description)
+                        handlePutApi(item.id, item.name, item.description)
                       }
                     >
                       修改
@@ -202,14 +202,16 @@ export default function Home() {
                     描述:{item.description}
                     <Input
                       placeholder="輸入新描述"
-                      value={putDescription}
+                      defaultValue={item.description}
                       onChange={(e) => editDescription(e)}
                     />
                     {errorEditDescription && (
                       <div className="text-red-500">{errorEditDescription}</div>
                     )}
                     <Button
-                      onClick={() => handlePutApi(item.id, item.name, "")}
+                      onClick={() =>
+                        handlePutApi(item.id, item.name, item.description)
+                      }
                     >
                       修改
                     </Button>
